@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Приглашение на Лазертаг!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: #0a0a1a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Laser tag arena background */
+        .bg-arena {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(255, 0, 80, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 255, 200, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(100, 0, 255, 0.06) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0a1a 0%, #0d0d2b 50%, #0a0a1a 100%);
+            z-index: 0;
+        }
+
+        /* Grid overlay */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                linear-gradient(rgba(0, 255, 200, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 200, 0.04) 1px, transparent 1px);
+            background-size: 80px 80px;
+            z-index: 1;
+        }
+
+        /* Laser beam effects */
+        .laser-beams {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .laser-beam {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 200, 0.3), transparent);
+            animation: laserSweep 8s linear infinite;
+            opacity: 0;
+        }
+
+        .laser-beam:nth-child(1) { top: 20%; width: 60%; left: -60%; animation-delay: 0s; }
+        .laser-beam:nth-child(2) { top: 45%; width: 50%; left: -50%; animation-delay: 3s; background: linear-gradient(90deg, transparent, rgba(255, 0, 85, 0.2), transparent); }
+        .laser-beam:nth-child(3) { top: 70%; width: 70%; left: -70%; animation-delay: 5s; background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent); }
+        .laser-beam:nth-child(4) { top: 35%; width: 40%; left: -40%; animation-delay: 7s; background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.2), transparent); }
+
+        @keyframes laserSweep {
+            0% { left: -60%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
+        }
+
+        /* Floating laser particles */
+        .particles {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-10vh) scale(1.5); }
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 255, 200, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+        }
+
+        .hero-badge {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: #00ffc8;
+            border: 1px solid rgba(0, 255, 200, 0.3);
+            padding: 8px 24px;
+            border-radius: 30px;
+            margin-bottom: 2rem;
+            animation: fadeInDown 1s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .hero-title .line1 {
+            display: block;
+            background: linear-gradient(135deg, #00ffc8, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(0, 255, 200, 0.3));
+        }
+
+        .hero-title .line2 {
+            display: block;
+            font-size: 0.6em;
+            background: linear-gradient(135deg, #ff6b35, #ff3366);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(255, 51, 102, 0.3));
+        }
+
+        .hero-age {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(4rem, 15vw, 8rem);
+            font-weight: 900;
+            background: linear-gradient(180deg, #ff3366, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin: 0.5rem 0;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out 0.6s both;
+            text-shadow: none;
+            filter: drop-shadow(0 0 40px rgba(255, 51, 102, 0.4));
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: #8899aa;
+            margin-top: 1rem;
+            animation: fadeInUp 1s ease-out 0.9s both;
+            position: relative;
+            z-index: 1;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            animation: bounce 2s ease-in-out infinite, fadeInUp 1s ease-out 1.2s both;
+            color: #00ffc8;
+            font-size: 1.5rem;
+            z-index: 1;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Styles */
+        section {
+            padding: 5rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title .highlight {
+            background: linear-gradient(135deg, #00ffc8, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #00ffc8, #00d4ff);
+            margin: 1rem auto 0;
+            border-radius: 2px;
+        }
+
+        /* Info Cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(0, 255, 200, 0.05), rgba(0, 212, 255, 0.05));
+            border: 1px solid rgba(0, 255, 200, 0.15);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffc8, transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 255, 200, 0.4);
+            box-shadow: 0 20px 60px rgba(0, 255, 200, 0.1);
+        }
+
+        .info-card:hover::before {
+            opacity: 1;
+        }
+
+        .info-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .info-card .label {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #00ffc8;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .info-card .value small {
+            display: block;
+            font-size: 0.8rem;
+            color: #00ffc8;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        /* Transport cards */
+        .transport-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .transport-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 255, 200, 0.12);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .transport-card:hover {
+            border-color: rgba(0, 255, 200, 0.3);
+            background: rgba(0, 255, 200, 0.05);
+        }
+
+        .transport-card .transport-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .transport-card .transport-type {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: #ff6b35;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .transport-card .transport-numbers {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* Schedule Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #00ffc8, #00d4ff, #ff3366);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 255, 200, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .timeline-item:hover {
+            background: rgba(0, 255, 200, 0.05);
+            border-color: rgba(0, 255, 200, 0.3);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.35rem;
+            top: 1.8rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ffc8;
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.5);
+        }
+
+        .timeline-item .time {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            color: #ff6b35;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-item .event-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-item .event-desc {
+            color: #8899aa;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Menu Section */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 107, 53, 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .menu-item:hover {
+            border-color: rgba(255, 107, 53, 0.4);
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(255, 107, 53, 0.1);
+        }
+
+        .menu-item .food-icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-item .food-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #ff6b35;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 5rem 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #0a0a1a;
+            background: linear-gradient(135deg, #00ffc8, #00d4ff);
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 40px rgba(0, 255, 200, 0.3);
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(0, 255, 200, 0.4);
+        }
+
+        /* Laser line decoration */
+        .laser-line {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00ffc8, #00d4ff, transparent);
+            margin: 0 auto;
+            opacity: 0.3;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #445566;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .hero { padding: 1.5rem; }
+            section { padding: 3rem 1.5rem; }
+            .info-grid { grid-template-columns: 1fr; }
+            .timeline { padding-left: 2.5rem; }
+            .timeline-item { padding: 1rem 1.2rem; }
+            .menu-grid { grid-template-columns: repeat(2, 1fr); }
+            .transport-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Glitch effect on hover for title */
+        .hero-title:hover .line1 {
+            animation: glitch 0.3s ease-in-out;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(3px, -3px); }
+            60% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+            100% { transform: translate(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-arena"></div>
+    <div class="bg-grid"></div>
+
+    <div class="particles" id="particles"></div>
+
+    <div class="content">
+
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-badge">⚡ Экстремальное приглашение ⚡</div>
+            <h1 class="hero-title">
+                <span class="line1">ВПЕРЕД, НА ЛАЗЕРТАГ!</span>
+                <span class="line2">ДЕНЬ РОЖДЕНИЯ</span>
+            </h1>
+            <div class="hero-age">12</div>
+            <p class="hero-subtitle">Приглашаю тебя на крутейший ДР!</p>
+            <div class="scroll-hint">▼</div>
+        </div>
+
+        <div class="laser-line"></div>
+
+        <!-- INFO -->
+        <section>
+            <h2 class="section-title">Когда и <span class="highlight">Где</span></h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <span class="icon">📅</span>
+                    <div class="label">Дата</div>
+                    <div class="value">02 ноября 2026</div>
+                </div>
+                <div class="info-card">
+                    <span class="icon">🕚</span>
+                    <div class="label">Время</div>
+                    <div class="value">10:45</div>
+                </div>
+                <div class="info-card">
+                    <span class="icon">📍</span>
+                    <div class="label">Место</div>
+                    <div class="value">ТРЦ «Карнавал»</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="laser-line"></div>
+
+        <!-- ADDRESS & MAP -->
+        <section>
+            <h2 class="section-title">Как <span class="highlight">Добераться</span> 📍</h2>
+            <div class="info-grid" style="margin-bottom: 2rem;">
+                <div class="info-card">
+                    <span class="icon">🏢</span>
+                    <div class="label">Адрес</div>
+                    <div class="value">г. Екатеринбург<br>ул. Халтурина, 55<br>ТРЦ «Карнавал»</div>
+                </div>
+                <div class="info-card">
+                    <span class="icon">🚶</span>
+                    <div class="label">Как найти</div>
+                    <div class="value">Лазертаг на 3 этаже<br>У кинотеатра</div>
+                </div>
+            </div>
+
+            <!-- Transport info -->
+            <div style="margin-bottom: 2rem;">
+                <p style="text-align: center; font-family: 'Orbitron', monospace; font-size: 0.8rem; letter-spacing: 3px; color: #00ffc8; text-transform: uppercase; margin-bottom: 1rem;">🚏 Остановка «Халтурина»</p>
+                <div class="transport-grid">
+                    <div class="transport-card">
+                        <span class="transport-icon">🚌</span>
+                        <div class="transport-type">Автобус</div>
+                        <div class="transport-numbers">5, 37, 43, 60, 89</div>
+                    </div>
+                    <div class="transport-card">
+                        <span class="transport-icon">🚋</span>
+                        <div class="transport-type">Трамвай</div>
+                        <div class="transport-numbers">5, 7, 8, 26, 41</div>
+                    </div>
+                    <div class="transport-card">
+                        <span class="transport-icon">🚐</span>
+                        <div class="transport-type">Маршрутка</div>
+                        <div class="transport-numbers">43, 67, 71, 82, 89</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div style="border-radius: 16px; overflow: hidden; border: 1px solid rgba(0, 255, 200, 0.15);">
+                <iframe
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=60.5483%2C56.8511%2C60.5523%2C56.8551&layer=mapnik&marker=56.8531%2C60.5503"
+                    style="width: 100%; height: 400px; border: none; filter: hue-rotate(180deg) saturate(1.5) brightness(0.7) contrast(1.3) invert(0.1);"
+                    loading="lazy"
+                    title="Карта — ТРЦ Карнавал, ул. Халтурина 55">
+                </iframe>
+            </div>
+            <p style="text-align: center; margin-top: 1rem; color: #8899aa; font-size: 0.9rem;">
+                📌 <a href="https://yandex.ru/maps/?text=Екатеринбург+ул+Халтурина+55+ТРЦ+Карнавал" target="_blank" style="color: #00ffc8; text-decoration: underline;">Открыть в Яндекс.Картах</a>
+            </p>
+        </section>
+
+        <div class="laser-line"></div>
+
+        <!-- SCHEDULE -->
+        <section>
+            <h2 class="section-title">Программа <span class="highlight">Дня</span></h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="time">10:45</div>
+                    <div class="event-title">🎯 Сбор команды</div>
+                    <div class="event-desc">Встречаемся в лазертаге, разбиваемся на команды</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="time">11:00</div>
+                    <div class="event-title">📋 Инструкции, экипировка, игра!</div>
+                    <div class="event-desc">Выдаём снаряжение и начинаем лазертаг-батл! Настоящие сражения в темноте — кто выживет, тот победит</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="time">12:00</div>
+                    <div class="event-title">🍔 Зона отдыха</div>
+                    <div class="event-desc">Бургеры, картошка фри, кола — восстанавливаем силы и делимся впечатлениями</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="laser-line"></div>
+
+        <!-- MENU -->
+        <section>
+            <h2 class="section-title">Будет <span class="highlight">Вкусно</span> 🍔</h2>
+            <div class="menu-grid">
+                <div class="menu-item">
+                    <span class="food-icon">🍔</span>
+                    <span class="food-name">Бургеры</span>
+                </div>
+                <div class="menu-item">
+                    <span class="food-icon">🍟</span>
+                    <span class="food-name">Картошка фри</span>
+                </div>
+                <div class="menu-item">
+                    <span class="food-icon">🥤</span>
+                    <span class="food-name">Кола</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="laser-line"></div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <h2 class="section-title" style="margin-bottom: 2rem;">Ты <span class="highlight">Идёшь?</span> 🎮</h2>
+            <a href="https://max.ru/u/f9LHodD0cOJqLXYM2blP9U0FOdb8dhyMg04SAaBoK8yDdvaXR8YaL1qaThM" target="_blank" class="cta-button">Подтвердить</a>
+            <p style="color: #445566; margin-top: 1.5rem; font-size: 0.85rem;">Нажми, чтобы подтвердить участие</p>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>🎮 02.11.2026 • ТРЦ «Карнавал» • Будет огонь! 🔥</p>
+    </footer>
+
+    <script>
+        // Create floating laser particles
+        const particlesContainer = document.getElementById('particles');
+        const colors = ['#00ffc8', '#00d4ff', '#ff3366', '#ff6b35', '#a855f7'];
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.boxShadow = `0 0 6px ${particle.style.backgroundColor}`;
+            particle.style.animationDuration = (Math.random() * 8 + 6) + 's';
+            particle.style.animationDelay = Math.random() * 3 + 's';
+            particlesContainer.appendChild(particle);
+
+            setTimeout(() => {
+                particle.remove();
+            }, 16000);
+        }
+
+        // Initial burst
+        for (let i = 0; i < 20; i++) {
+            setTimeout(createParticle, i * 200);
+        }
+
+        // Continuous generation
+        setInterval(createParticle, 800);
+
+        // Scroll-triggered animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.info-card, .timeline-item, .menu-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            observer.observe(el);
+        });
+
+        // Console Easter egg
+        console.log('%c🎮 DDT ON! 🎮', 'font-size: 40px; color: #00ffc8; font-weight: bold; text-shadow: 0 0 10px #00ffc8;');
+        console.log('%c02.11.2026 — ТРЦ Карнавал', 'font-size: 16px; color: #ff6b35;');
+    </script>
+</body>
+</html>
