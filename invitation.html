@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Приглашение на Лазертаг!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: #0a0a1a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Laser tag arena background */
+        .bg-arena {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(255, 0, 80, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 255, 200, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(100, 0, 255, 0.06) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0a1a 0%, #0d0d2b 50%, #0a0a1a 100%);
+            z-index: 0;
+        }
+
+        /* Grid overlay */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                linear-gradient(rgba(0, 255, 200, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 200, 0.04) 1px, transparent 1px);
+            background-size: 80px 80px;
+            z-index: 1;
+        }
+
+        /* Laser tag player silhouettes */
+        .player-shapes {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .player {
+            position: absolute;
+            opacity: 0.04;
+            animation: floatPlayer 20s ease-in-out infinite;
+        }
+
+        .player svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+
+        .player-1 {
+            top: 8%; left: 3%; width: 120px; height: 220px;
+            color: #ff0055;
+            animation-delay: 0s;
+            animation-duration: 22s;
+        }
+
+        .player-2 {
+            top: 15%; right: 5%; width: 110px; height: 200px;
+            color: #00ffc8;
+            animation-delay: -5s;
+            animation-duration: 18s;
+        }
+
+        .player-3 {
+            bottom: 15%; left: 8%; width: 100px; height: 190px;
+            color: #a855f7;
+            animation-delay: -10s;
+            animation-duration: 25s;
+        }
+
+        .player-4 {
+            top: 55%; right: 3%; width: 115px; height: 210px;
+            color: #ff6b35;
+            animation-delay: -3s;
+            animation-duration: 20s;
+        }
+
+        .player-5 {
+            top: 2%; right: 25%; width: 90px; height: 170px;
+            color: #00d4ff;
+            animation-delay: -8s;
+            animation-duration: 24s;
+        }
+
+        .player-6 {
+            bottom: 5%; left: 25%; width: 105px; height: 200px;
+            color: #ff3366;
+            animation-delay: -12s;
+            animation-duration: 19s;
+        }
+
+        .player-7 {
+            top: 40%; left: 2%; width: 95px; height: 185px;
+            color: #fbbf24;
+            animation-delay: -6s;
+            animation-duration: 23s;
+        }
+
+        @keyframes floatPlayer {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-15px) rotate(3deg) scale(1.02); }
+            50% { transform: translateY(-5px) rotate(-2deg) scale(0.98); }
+            75% { transform: translateY(-20px) rotate(1deg) scale(1.01); }
+        }
+
+        /* Laser beam effects */
+        .laser-beams {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .laser-beam {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 200, 0.3), transparent);
+            animation: laserSweep 8s linear infinite;
+            opacity: 0;
+        }
+
+        .laser-beam:nth-child(1) { top: 20%; width: 60%; left: -60%; animation-delay: 0s; }
+        .laser-beam:nth-child(2) { top: 45%; width: 50%; left: -50%; animation-delay: 3s; background: linear-gradient(90deg, transparent, rgba(255, 0, 85, 0.2), transparent); }
+        .laser-beam:nth-child(3) { top: 70%; width: 70%; left: -70%; animation-delay: 5s; background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent); }
+        .laser-beam:nth-child(4) { top: 35%; width: 40%; left: -40%; animation-delay: 7s; background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.2), transparent); }
+
+        @keyframes laserSweep {
+            0% { left: -60%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
+        }
+
+        /* Floating laser particles */
+        .particles {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-10vh) scale(1.5); }
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 255, 200, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+        }
+
+        .hero-badge {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: #00ffc8;
+            border: 1px solid rgba(0, 255, 200, 0.3);
+            padding: 8px 24px;
+            border-radius: 30px;
+            margin-bottom: 2rem;
+            animation: fadeInDown 1s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .hero-title .line1 {
+            display: block;
+            background: linear-gradient(135deg, #00ffc8, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(0, 255, 200, 0.3));
+        }
+
+        .hero-title .line2 {
+            display: block;
+            font-size: 0.6em;
+            background: linear-gradient(135deg, #ff6b35, #ff3366);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(255, 51, 102, 0.3));
+        }
+
+        .hero-age {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(4rem, 15vw, 8rem);
+            font-weight: 900;
+            background: linear-gradient(180deg, #ff3366, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin: 0.5rem 0;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out 0.6s both;
+            text-shadow: none;
+            filter: drop-shadow(0 0 40px rgba(255, 51, 102, 0.4));
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: #8899aa;
+            margin-top: 1rem;
+            animation: fadeInUp 1s ease-out 0.9s both;
+            position: relative;
+            z-index: 1;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            animation: bounce 2s ease-in-out infinite, fadeInUp 1s ease-out 1.2s both;
+            color: #00ffc8;
+            font-size: 1.5rem;
+            z-index: 1;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Styles */
+        section {
+            padding: 5rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title .highlight {
+            background: linear-gradient(135deg, #00ffc8, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #00ffc8, #00d4ff);
+            margin: 1rem auto 0;
+            border-radius: 2px;
+        }
+
+        /* Info Cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(0, 255, 200, 0.05), rgba(0, 212, 255, 0.05));
+            border: 1px solid rgba(0, 255, 200, 0.15);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffc8, transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 255, 200, 0.4);
+            box-shadow: 0 20px 60px rgba(0, 255, 200, 0.1);
+        }
+
+        .info-card:hover::before {
+            opacity: 1;
+        }
+
+        .info-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .info-card .label {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #00ffc8;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .info-card .value small {
+            display: block;
+            font-size: 0.8rem;
+            color: #00ffc8;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        /* Transport cards */
+        .transport-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .transport-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 255, 200, 0.12);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .transport-card:hover {
+            border-color: rgba(0, 255, 200, 0.3);
+            background: rgba(0, 255, 200, 0.05);
+        }
+
+        .transport-card .transport-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .transport-card .transport-type {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: #ff6b35;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .transport-card .transport-numbers {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* Schedule Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #00ffc8, #00d4ff, #ff3366);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 255, 200, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .timeline-item:hover {
+            background: rgba(0, 255, 200, 0.05);
+            border-color: rgba(0, 255, 200, 0.3);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.35rem;
+            top: 1.8rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ffc8;
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.5);
+        }
+
+        .timeline-item .time {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            color: #ff6b35;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-item .event-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-item .event-desc {
+            color: #8899aa;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Menu Section */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 107, 53, 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .menu-item:hover {
+            border-color: rgba(255, 107, 53, 0.4);
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(255, 107, 53, 0.1);
+        }
+
+        .menu-item .food-icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-item .food-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #ff6b35;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 5rem 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #0a0a1a;
+            background: linear-gradient(135deg, #00ffc8, #00d4ff);
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 40px rgba(0, 255, 200, 0.3);
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(0, 255, 200, 0.4);
+        }
+
+        /* Laser line decoration */
+        .laser-line {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00ffc8, #00d4ff, transparent);
+            margin: 0 auto;
+            opacity: 0.3;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #445566;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .hero { padding: 1.5rem; }
+            section { padding: 3rem 1.5rem; }
+            .info-grid { grid-template-columns: 1fr; }
+            .timeline { padding-left: 2.5rem; }
+            .timeline-item { padding: 1rem 1.2rem; }
+            .menu-grid { grid-template-columns: repeat(2, 1fr); }
+            .transport-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Glitch effect on hover for title */
+        .hero-title:hover .line1 {
+            animation: glitch 0.3s ease-in-out;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(3px, -3px); }
+            60% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+            100% { transform: translate(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-arena"></div>
+    <div class="bg-grid"></div>
+    <div class="player-shapes">
+        <!-- Player 1 — standing, aiming rifle -->
+        <div class="player player-1">
+            <svg viewBox="0 0 120 220" xmlns="http://www.w3.org/2000/svg">
+                <path d="M60,8 C66,8 71,12 71,18 C71,24 66,28 60,28 C54,28 49,24 49,18 C49,12 54,8 60,8Z M57,31 L63,31 L65,33 L65,36 L63,37 L57,37 L55,36 L55,33Z M53,39 L67,39 L70,42 L72,50 L72,55 L70,57 L50,57 L48,55 L48,50 L50,42Z M46,57 L50,57 L48,85 L44,85 L46,57Z M70,57 L74,57 L76,85 L72,85 L70,57Z M48,57 L50,85 L48,105 L35,110 L33,108 L35,106 L45,103 L45,85 L46,57Z M72,57 L70,85 L70,103 L83,108 L85,106 L83,104 L74,100 L74,85 L72,57Z M50,105 L54,105 L55,160 L55,185 L53,187 L40,187 L38,185 L38,183 L40,181 L46,180 L46,160 L50,105Z M70,105 L66,105 L65,160 L65,185 L67,187 L80,187 L82,185 L82,183 L80,181 L74,180 L74,160 L70,105Z M54,162 L58,162 L58,183 L54,183 L54,162Z M62,162 L66,162 L66,183 L62,183 L62,162Z M70,57 L95,60 L97,62 L100,64 L98,66 L96,65 L74,62 L72,60Z M70,64 L93,67 L93,70 L70,68Z"/>
+            </svg>
+        </div>
+        <!-- Player 2 — crouching, aiming pistol -->
+        <div class="player player-2">
+            <svg viewBox="0 0 110 200" xmlns="http://www.w3.org/2000/svg">
+                <path d="M55,15 C61,15 66,19 66,25 C66,31 61,35 55,35 C49,35 44,31 44,25 C44,19 49,15 55,15Z M52,38 L58,38 L60,40 L60,43 L58,44 L52,44 L50,43 L50,40Z M47,46 L63,46 L66,49 L67,55 L67,58 L65,60 L45,60 L43,58 L43,55 L45,49Z M42,60 L46,60 L44,78 L40,78 L42,60Z M67,60 L71,60 L73,78 L69,78 L67,60Z M44,60 L46,78 L44,92 L33,96 L30,94 L32,92 L42,88 L42,78 L44,60Z M67,60 L65,78 L65,92 L76,96 L79,94 L77,92 L69,88 L69,78 L67,60Z M45,92 L48,94 L50,130 L50,155 L48,157 L36,157 L34,155 L34,153 L36,151 L44,148 L44,130 L45,92Z M66,92 L64,94 L63,130 L63,155 L65,157 L77,157 L79,155 L79,153 L77,151 L69,148 L69,130 L66,92Z M47,132 L52,132 L52,155 L47,155 L47,132Z M60,132 L65,132 L65,155 L60,155 L60,132Z M67,60 L88,63 L90,65 L92,67 L90,69 L88,68 L69,65 L67,62Z M67,66 L85,68 L85,71 L67,68Z"/>
+            </svg>
+        </div>
+        <!-- Player 3 — running forward, weapon raised -->
+        <div class="player player-3">
+            <svg viewBox="0 0 100 190" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,10 C56,10 61,14 61,20 C61,26 56,30 50,30 C44,30 39,26 39,20 C39,14 44,10 50,10Z M47,33 L53,33 L55,35 L55,38 L53,39 L47,39 L45,38 L45,35Z M43,41 L57,41 L60,44 L61,50 L61,53 L59,55 L41,55 L39,53 L39,50 L41,44Z M38,55 L42,55 L40,75 L37,75 L38,55Z M61,55 L65,55 L67,75 L63,75 L61,55Z M41,55 L43,75 L41,90 L30,95 L28,93 L30,91 L40,86 L40,75 L41,55Z M61,55 L59,75 L59,90 L70,95 L72,93 L70,91 L62,86 L62,75 L61,55Z M42,90 L45,92 L46,125 L44,145 L43,150 L30,152 L27,150 L28,148 L30,147 L40,144 L41,125 L42,90Z M59,90 L56,92 L55,125 L57,145 L58,150 L70,152 L73,150 L72,148 L70,147 L60,144 L59,125 L59,90Z M43,127 L48,127 L48,148 L43,148 L43,127Z M54,127 L59,127 L59,148 L54,148 L54,127Z M61,55 L82,48 L84,46 L86,44 L84,42 L82,44 L63,50 L61,52Z M61,50 L80,44 L80,47 L61,52Z"/>
+            </svg>
+        </div>
+        <!-- Player 4 — tactical stance, dual weapons -->
+        <div class="player player-4">
+            <svg viewBox="0 0 115 210" xmlns="http://www.w3.org/2000/svg">
+                <path d="M57,10 C63,10 68,14 68,20 C68,26 63,30 57,30 C51,30 46,26 46,20 C46,14 51,10 57,10Z M54,33 L60,33 L62,35 L62,38 L60,39 L54,39 L52,38 L52,35Z M50,41 L64,41 L67,44 L68,52 L68,55 L66,57 L48,57 L46,55 L46,52 L48,44Z M44,57 L48,57 L46,82 L42,82 L44,57Z M68,57 L72,57 L74,82 L70,82 L68,57Z M46,57 L48,82 L46,100 L34,105 L31,103 L33,101 L44,96 L44,82 L46,57Z M68,57 L66,82 L66,100 L78,105 L81,103 L79,101 L70,96 L70,82 L68,57Z M47,100 L50,102 L51,150 L51,175 L49,177 L36,177 L34,175 L34,173 L36,171 L45,168 L45,150 L47,100Z M67,100 L64,102 L63,150 L63,175 L65,177 L78,177 L80,175 L80,173 L78,171 L69,168 L69,150 L67,100Z M48,152 L53,152 L53,175 L48,175 L48,152Z M58,152 L63,152 L63,175 L58,175 L58,152Z M68,57 L92,60 L94,62 L96,64 L94,66 L92,65 L70,62 L68,59Z M68,63 L90,65 L90,68 L68,65Z M46,57 L22,60 L20,62 L18,64 L20,66 L22,65 L44,62 L46,59Z M46,63 L24,65 L24,68 L46,65Z"/>
+            </svg>
+        </div>
+        <!-- Player 5 — aiming up, sniper style -->
+        <div class="player player-5">
+            <svg viewBox="0 0 90 170" xmlns="http://www.w3.org/2000/svg">
+                <path d="M45,8 C50,8 55,12 55,17 C55,22 50,26 45,26 C40,26 35,22 35,17 C35,12 40,8 45,8Z M43,29 L47,29 L49,31 L49,33 L47,34 L43,34 L41,33 L41,31Z M40,36 L50,36 L53,39 L54,45 L54,48 L52,50 L38,50 L36,48 L36,45 L38,39Z M36,50 L39,50 L38,68 L35,68 L36,50Z M54,50 L57,50 L58,68 L55,68 L54,50Z M38,50 L40,68 L38,80 L28,84 L26,82 L28,80 L37,76 L37,68 L38,50Z M54,50 L52,68 L52,80 L62,84 L64,82 L62,80 L55,76 L55,68 L54,50Z M39,80 L42,82 L43,115 L43,135 L41,137 L30,137 L28,135 L28,133 L30,131 L38,128 L38,115 L39,80Z M53,80 L50,82 L49,115 L49,135 L51,137 L62,137 L64,135 L64,133 L62,131 L54,128 L54,115 L53,80Z M40,117 L45,117 L45,135 L40,135 L40,117Z M47,117 L52,117 L52,135 L47,135 L47,117Z M54,50 L78,47 L80,45 L82,43 L80,41 L78,43 L56,47 L54,49Z M54,45 L76,42 L76,45 L54,48Z"/>
+            </svg>
+        </div>
+        <!-- Player 6 — side profile, ready stance -->
+        <div class="player player-6">
+            <svg viewBox="0 0 105 200" xmlns="http://www.w3.org/2000/svg">
+                <path d="M52,10 C58,10 63,14 63,20 C63,26 58,30 52,30 C46,30 41,26 41,20 C41,14 46,10 52,10Z M49,33 L55,33 L57,35 L57,38 L55,39 L49,39 L47,38 L47,35Z M45,41 L59,41 L62,44 L63,52 L63,55 L61,57 L43,57 L41,55 L41,52 L43,44Z M39,57 L43,57 L41,80 L37,80 L39,57Z M63,57 L67,57 L69,80 L65,80 L63,57Z M43,57 L45,80 L43,95 L32,99 L29,97 L31,95 L41,91 L41,80 L43,57Z M63,57 L61,80 L61,95 L72,99 L75,97 L73,95 L65,91 L65,80 L63,57Z M44,95 L46,97 L48,140 L48,165 L46,167 L34,167 L32,165 L32,163 L34,161 L44,158 L44,140 L44,95Z M62,95 L60,97 L58,140 L58,165 L60,167 L72,167 L74,165 L74,163 L72,161 L63,158 L63,140 L62,95Z M45,142 L50,142 L50,165 L45,165 L45,142Z M54,142 L59,142 L59,165 L54,165 L54,142Z M63,57 L85,60 L87,62 L89,64 L87,66 L85,65 L65,62 L63,59Z M63,63 L83,65 L83,68 L63,65Z M41,57 L19,60 L17,62 L15,64 L17,66 L19,65 L39,62 L41,59Z M41,63 L21,65 L21,68 L41,65Z"/>
+            </svg>
+        </div>
+        <!-- Player 7 — action pose, jumping -->
+        <div class="player player-7">
+            <svg viewBox="0 0 95 185" xmlns="http://www.w3.org/2000/svg">
+                <path d="M47,5 C53,5 58,9 58,15 C58,21 53,25 47,25 C41,25 36,21 36,15 C36,9 41,5 47,5Z M44,28 L50,28 L52,30 L52,33 L50,34 L44,34 L42,33 L42,30Z M40,36 L54,36 L57,39 L58,47 L58,50 L56,52 L38,52 L36,50 L36,47 L38,39Z M34,52 L38,52 L36,70 L32,70 L34,52Z M58,52 L62,52 L64,70 L60,70 L58,52Z M38,52 L40,70 L38,82 L28,86 L25,84 L27,82 L37,78 L37,70 L38,52Z M58,52 L56,70 L56,82 L66,86 L69,84 L67,82 L60,78 L60,70 L58,52Z M39,82 L42,84 L43,110 L42,130 L40,135 L30,138 L27,136 L28,134 L30,133 L38,130 L38,110 L39,82Z M57,82 L54,84 L53,110 L55,130 L57,135 L67,138 L70,136 L69,134 L67,133 L59,130 L58,110 L57,82Z M40,112 L45,112 L45,133 L40,133 L40,112Z M50,112 L55,112 L55,133 L50,133 L50,112Z M58,52 L80,45 L82,43 L84,41 L82,39 L80,41 L60,47 L58,49Z M58,47 L78,40 L78,43 L58,48Z"/>
+            </svg>
+        </div>
+    </div>
+    <div class="particles" id="particles"></div>
+
+    <div class="content">
+
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-badge">⚡ Экстремальное приглашение ⚡</div>
+            <h1 class="hero-title">
+                <span class="line1">ВПЕРЕД, НА ЛАЗЕРТАГ!</span>
+                <span class="line2">ДЕНЬ РОЖДЕНИЯ</span>
+            </h1>
+            <div class="hero-age">12</div>
+            <p class="hero-subtitle">Приглашаю тебя на крутейший ДР!</p>
+            <div class="scroll-hint">▼</div>
+        </div>
+
+        <div class="laser-line"></div>
+
+        <!-- INFO -->
+        <section>
+            <h2 class="section-title">Когда и <span class="highlight">Где</span></h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <span class="icon">📅</span>
+                    <div class="label">Дата</div>
+                    <div class="value">02 ноября 2026</div>
+                </div>
+                <div class="info-card">
+                    <span class="icon">🕚</span>
+                    <div class="label">Время</div>
+                    <div class="value">10:45</div>
+                </div>
+                <div class="info-card">
+                    <span class="icon">📍</span>
+                    <div class="label">Место</div>
+                    <div class="value">ТРЦ «Карнавал»</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="laser-line"></div>
+
+        <!-- ADDRESS & MAP -->
+        <section>
+            <h2 class="section-title">Как <span class="highlight">Добераться</span> 📍</h2>
+            <div class="info-grid" style="margin-bottom: 2rem;">
+                <div class="info-card">
+                    <span class="icon">🏢</span>
+                    <div class="label">Адрес</div>
+                    <div class="value">г. Екатеринбург<br>ул. Халтурина, 55<br>ТРЦ «Карнавал»</div>
+                </div>
+                <div class="info-card">
+                    <span class="icon">🚶</span>
+                    <div class="label">Как найти</div>
+                    <div class="value">Большой ТРЦ в центре<br>вход со стороны двора<br>лaserтаг на 2 этаже</div>
+                </div>
+            </div>
+
+            <!-- Transport info -->
+            <div style="margin-bottom: 2rem;">
+                <p style="text-align: center; font-family: 'Orbitron', monospace; font-size: 0.8rem; letter-spacing: 3px; color: #00ffc8; text-transform: uppercase; margin-bottom: 1rem;">🚏 Остановка «Халтурина»</p>
+                <div class="transport-grid">
+                    <div class="transport-card">
+                        <span class="transport-icon">🚌</span>
+                        <div class="transport-type">Автобус</div>
+                        <div class="transport-numbers">5, 37, 43, 60, 89</div>
+                    </div>
+                    <div class="transport-card">
+                        <span class="transport-icon">🚋</span>
+                        <div class="transport-type">Трамвай</div>
+                        <div class="transport-numbers">5, 7, 8, 26, 41</div>
+                    </div>
+                    <div class="transport-card">
+                        <span class="transport-icon">🚐</span>
+                        <div class="transport-type">Маршрутка</div>
+                        <div class="transport-numbers">43, 67, 71, 82, 89</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div style="border-radius: 16px; overflow: hidden; border: 1px solid rgba(0, 255, 200, 0.15);">
+                <iframe
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=60.5483%2C56.8511%2C60.5523%2C56.8551&layer=mapnik&marker=56.8531%2C60.5503"
+                    style="width: 100%; height: 400px; border: none; filter: hue-rotate(180deg) saturate(1.5) brightness(0.7) contrast(1.3) invert(0.1);"
+                    loading="lazy"
+                    title="Карта — ТРЦ Карнавал, ул. Халтурина 55">
+                </iframe>
+            </div>
+            <p style="text-align: center; margin-top: 1rem; color: #8899aa; font-size: 0.9rem;">
+                📌 <a href="https://yandex.ru/maps/?text=Екатеринбург+ул+Халтурина+55+ТРЦ+Карнавал" target="_blank" style="color: #00ffc8; text-decoration: underline;">Открыть в Яндекс.Картах</a>
+            </p>
+        </section>
+
+        <div class="laser-line"></div>
+
+        <!-- SCHEDULE -->
+        <section>
+            <h2 class="section-title">Программа <span class="highlight">Дня</span></h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="time">10:45</div>
+                    <div class="event-title">🎯 Сбор команды</div>
+                    <div class="event-desc">Встречаемся в лазертаге, разбиваемся на команды</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="time">11:00</div>
+                    <div class="event-title">📋 Инструкции, экипировка, игра!</div>
+                    <div class="event-desc">Выдаём снаряжение и начинаем лазертаг-батл! Настоящие сражения в темноте — кто выживет, тот победит</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="time">12:00</div>
+                    <div class="event-title">🍔 Зона отдыха</div>
+                    <div class="event-desc">Бургеры, картошка фри, кола — восстанавливаем силы и делимся впечатлениями</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="laser-line"></div>
+
+        <!-- MENU -->
+        <section>
+            <h2 class="section-title">Будет <span class="highlight">Вкусно</span> 🍔</h2>
+            <div class="menu-grid">
+                <div class="menu-item">
+                    <span class="food-icon">🍔</span>
+                    <span class="food-name">Бургеры</span>
+                </div>
+                <div class="menu-item">
+                    <span class="food-icon">🍟</span>
+                    <span class="food-name">Картошка фри</span>
+                </div>
+                <div class="menu-item">
+                    <span class="food-icon">🥤</span>
+                    <span class="food-name">Кола</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="laser-line"></div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <h2 class="section-title" style="margin-bottom: 2rem;">Ты <span class="highlight">Идёшь?</span> 🎮</h2>
+            <a href="https://max.ru/u/f9LHodD0cOJqLXYM2blP9U0FOdb8dhyMg04SAaBoK8yDdvaXR8YaL1qaThM" target="_blank" class="cta-button">Подтвердить</a>
+            <p style="color: #445566; margin-top: 1.5rem; font-size: 0.85rem;">Нажми, чтобы подтвердить участие</p>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>🎮 02.11.2026 • ТРЦ «Карнавал» • Будет огонь! 🔥</p>
+    </footer>
+
+    <script>
+        // Create floating laser particles
+        const particlesContainer = document.getElementById('particles');
+        const colors = ['#00ffc8', '#00d4ff', '#ff3366', '#ff6b35', '#a855f7'];
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.boxShadow = `0 0 6px ${particle.style.backgroundColor}`;
+            particle.style.animationDuration = (Math.random() * 8 + 6) + 's';
+            particle.style.animationDelay = Math.random() * 3 + 's';
+            particlesContainer.appendChild(particle);
+
+            setTimeout(() => {
+                particle.remove();
+            }, 16000);
+        }
+
+        // Initial burst
+        for (let i = 0; i < 20; i++) {
+            setTimeout(createParticle, i * 200);
+        }
+
+        // Continuous generation
+        setInterval(createParticle, 800);
+
+        // Scroll-triggered animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.info-card, .timeline-item, .menu-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            observer.observe(el);
+        });
+
+        // Console Easter egg
+        console.log('%c🎮 DDT ON! 🎮', 'font-size: 40px; color: #00ffc8; font-weight: bold; text-shadow: 0 0 10px #00ffc8;');
+        console.log('%c02.11.2026 — ТРЦ Карнавал', 'font-size: 16px; color: #ff6b35;');
+    </script>
+</body>
+</html>
